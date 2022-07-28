@@ -1,11 +1,13 @@
 <template>
-	<ul class="tags-list" :class="classObject" ref="list">
-		<li class="tags-item"  v-for="(tag, index) in list" :key="tag.id" ref="tag">
-			<v-icon class="tags-divider" v-if="index > 0" v-text="'mdi-vector-point'"/>
-			<v-icon class="tags-icon" v-if="tag.icon" v-text="tag.icon"/>
-			<span class="tags-text" v-text="tag.name"/>
-		</li>
-	</ul>
+	<div class="tags-list" :class="classObject" ref="list">
+		<template v-for="(tag, index) in list">
+			<v-icon class="tags-divider" v-if="index > 0" v-text="'mdi-vector-point'" />
+			<span class="tags-item" :key="index" ref="tag">
+				<v-icon class="tags-icon" v-if="tag.icon" v-text="tag.icon"/>
+				<span class="tags-text" v-text="tag.name"/>
+			</span>
+		</template>
+	</div>
 </template>
 
 <script>
@@ -33,7 +35,7 @@
 					'center': this.align === 'center',
 					'left': this.align === 'start',
 				}
-			}
+			},
 		},
 		mounted() {
 			const config = {
@@ -43,7 +45,18 @@
 
 			this.observer = new IntersectionObserver(function(entries) {
 				entries.forEach(entry => {
-					entry.target.style = entry.isIntersecting ? '' : 'visibility: hidden'
+					if (entry.isIntersecting) {
+						entry.target.style = ''
+						if (entry.target.previousElementSibling) {
+							entry.target.previousElementSibling.style =  ''
+						}
+					} else {
+						entry.target.style =  'display: none'
+						if (entry.target.previousElementSibling) {
+							entry.target.previousElementSibling.style =  'display: none'
+						}
+					}
+
 				});
 			}, config);
 			this.$refs.tag.forEach(e => this.observer.observe(e))
@@ -57,8 +70,9 @@
 <style lang="scss" scoped>
 	.tags {
 	  &-list {
-		padding: 30px 40px;
+		padding: 30px 20px;
 		display: flex;
+		align-items: center;
 		flex-wrap: nowrap;
 		flex-shrink: 1;
 	  }
@@ -68,10 +82,10 @@
       }
 
 	  &-item {
+		padding: 0 20px;
 		display: flex;
 		align-items: center;
         flex-wrap: nowrap;
-		flex-grow: 2;
 
 		&:hover {
           cursor: pointer;
@@ -84,7 +98,7 @@
 	  }
 
 	  &-divider {
-		padding: 0 40px;
+		padding: 0 20px;
 		width: 10px;
 		height: 10px;
 	  }
